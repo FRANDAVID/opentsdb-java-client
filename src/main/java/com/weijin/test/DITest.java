@@ -7,6 +7,7 @@ public class DITest {
 		System.out.println(222);
 		System.out.println(222);
 		System.out.println(222);
+		System.out.println(3);
 		
 	}
 }
