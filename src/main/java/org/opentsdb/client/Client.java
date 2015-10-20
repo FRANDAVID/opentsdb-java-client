@@ -12,7 +12,8 @@ public interface Client {
 
 	// 第3次修改
 //	第四次修改
-	public final static Integer GIT=0;
+	public final static Integer GIT1=0;
+	public final static Integer GIT2=0;
 	public final static String POST_API = "/api/put";
 
 	/**
