@@ -7,7 +7,8 @@ import org.opentsdb.client.response.Response;
 
 public interface Client {
 
-	// weijin add test
+	// weijin add test 
+	// 2015-10-20 second test
 	public final static String POST_API = "/api/put";
 
 	/**
