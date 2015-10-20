@@ -6,6 +6,7 @@ public class DITest {
 		System.out.println("test2");
 		System.out.println(222);
 		System.out.println(222);
+		System.out.println(222);
 		
 	}
 }
