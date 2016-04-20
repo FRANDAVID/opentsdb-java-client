@@ -25,6 +25,8 @@ public class MetricBuilderTest {
 		builder.addMetric("metric2").setDataPoint(2, 232.34)
 				.addTag("tag3", "tab3value");
 
+//		String metric = builder.build();
+//		System.out.println(metric);
 		assertThat(builder.build(), equalTo(json));
 	}
 
