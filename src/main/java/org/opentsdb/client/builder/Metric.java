@@ -110,6 +110,10 @@ public class Metric {
 	public Metric setDataPoint(long timestamp, long value) {
 		return innerAddDataPoint(timestamp, value);
 	}
+	
+	public Metric setDataPoint(long timestamp, Number value) {
+        return innerAddDataPoint(timestamp, value);
+    }
 
 	/**
 	 * Adds the data point to the metric.
@@ -123,7 +127,7 @@ public class Metric {
 	public Metric setDataPoint(long timestamp, double value) {
 		return innerAddDataPoint(timestamp, value);
 	}
-
+	
 	/**
 	 * Adds the data point to the metric with a timestamp of now.
 	 *

@@ -1,0 +1,40 @@
+[
+  {
+    "metric": "tsd.hbase.puts",
+    "tags": {},
+    "aggregatedTags": [
+      "host"
+    ],
+    "annotations": [
+      {
+        "tsuid": "00001C0000FB0000FB",
+        "description": "Testing Annotations",
+        "notes": "These would be details about the event, the description is just a summary",
+        "custom": {
+          "owner": "jdoe",
+          "dept": "ops"
+        },
+        "endTime": 0,
+        "startTime": 1365966062
+      }
+    ],
+    "globalAnnotations": [
+      {
+        "description": "Notice",
+        "notes": "DAL was down during this period",
+        "custom": null,
+        "endTime": 1365966164,
+        "startTime": 1365966064
+      }
+    ],
+    "tsuids": [
+      "0023E3000002000008000006000001"
+    ],
+    "dps": {
+      "1365966001": 25595461080,
+      "1365966061": 25595542522,
+      "1365966062": 25595543979,
+      "1365973801": 25717417859
+    }
+  }
+]

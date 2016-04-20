@@ -1,32 +1,68 @@
 package org.opentsdb.client;
 
 import java.io.IOException;
-import java.util.Date;
+import java.util.List;
 
 import org.junit.Test;
+import org.opentsdb.client.builder.Aggregator;
+import org.opentsdb.client.builder.BaseQueryBuilder;
+import org.opentsdb.client.builder.IQueryBuilder;
 import org.opentsdb.client.builder.MetricBuilder;
+import org.opentsdb.client.builder.Query;
+import org.opentsdb.client.response.QueryResponse;
 import org.opentsdb.client.response.Response;
 
-public class HttpClientTest {
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-	@Test
-	public void test_pushMetrics_DefaultRetries() {
-		HttpClientImpl client = new HttpClientImpl("http://192.168.120.120:4242");
+public class HttpClientTest
+{
+    private Gson mapper = new GsonBuilder().create();
 
-		MetricBuilder builder = MetricBuilder.getInstance();
+    HttpClientImpl client = new HttpClientImpl("http://192.168.120.120:4242");
 
-		builder.addMetric("metric1").setDataPoint(new Date().getTime(), 30L)
-				.addTag("tag1", "tab1value").addTag("tag2", "tab2value");
+    @Test
+    public void test_pushMetrics_DefaultRetries()
+    {
 
-		builder.addMetric("metric2").setDataPoint(new Date().getTime(), 232.34)
-				.addTag("tag3", "tab3value");
+        MetricBuilder builder = MetricBuilder.getInstance();
 
-		try {
-			Response response = client.pushMetrics(builder,
-					ExpectResponse.SUMMARY);
-			System.out.println(response);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+        builder.addMetric("metric3.test1").setDataPoint(2, 30L)
+                .addTag("tag1", "tab1value").addTag("tag2", "tab2value");
+
+        builder.addMetric("metric3.test1").setDataPoint(3, 30L)
+                .addTag("tag1", "tab2value").addTag("tag2", "tab2value");
+
+        builder.addMetric("metric3.test2").setDataPoint(2, 232.34)
+                .addTag("tag3", "tab3value");
+
+        try
+        {
+            Response response = client.pushMetrics(builder,
+                    ExpectResponse.SUMMARY);
+            System.out.println(response);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testQueryMetrics() throws IOException
+    {
+        Query query = new Query();
+        query.setAggregator(Aggregator.SUM.getName());
+        query.setMetric("metric3.test1");
+        IQueryBuilder queryBuilder = BaseQueryBuilder.getInstance().setStart(1l).addQuery(query);
+        QueryResponse response = client.queryMetrics(queryBuilder);
+        System.out.println(mapper.toJson(response.getEntries().get(0)));
+    }
+
+    @Test
+    public void testSuggest() throws IOException
+    {
+        List<String> suggests = client.suggest(SuggestType.METRICS, "metric1.", 100);
+        System.out.println(suggests);
+    }
 }

@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -24,11 +25,11 @@ public class BaseQueryBuilder implements IQueryBuilder
 
     @SerializedName("start")
     @Expose
-    private Integer start;
+    private Long start;
 
     @SerializedName("end")
     @Expose
-    private Integer end;
+    private Long end;
 
     @SerializedName("queries")
     @Expose
@@ -63,14 +64,7 @@ public class BaseQueryBuilder implements IQueryBuilder
     @Override
     public String build() throws IOException
     {
-        JsonObject json = new JsonObject();
         checkNotNull(start, "start timestamp is required!");
-        json.addProperty("start", start);
-        // not required
-        if (end != null)
-        {
-            json.addProperty("end", end);
-        }
         checkState(queries.size() > 0, "at least one query is required!");
         for (Query q : queries)
         {
@@ -78,8 +72,7 @@ public class BaseQueryBuilder implements IQueryBuilder
             checkNotNull(q.getMetric(), q + " query needs a given metric");
             checkNotNull(q.getAggregator(), q + " query needs a given aggregator");
         }
-        json.addProperty("queries", mapper.toJson(queries));
-        return json.toString();
+        return mapper.toJson(this);
     }
 
     /**
@@ -87,7 +80,7 @@ public class BaseQueryBuilder implements IQueryBuilder
      * @return
      *         The start
      */
-    public Integer getStart()
+    public Long getStart()
     {
         return start;
     }
@@ -97,7 +90,7 @@ public class BaseQueryBuilder implements IQueryBuilder
      * @param start
      *            The start
      */
-    public BaseQueryBuilder setStart(Integer start)
+    public BaseQueryBuilder setStart(Long start)
     {
         this.start = start;
         return this;
@@ -108,7 +101,7 @@ public class BaseQueryBuilder implements IQueryBuilder
      * @return
      *         The end
      */
-    public Integer getEnd()
+    public Long getEnd()
     {
         return end;
     }
@@ -118,7 +111,7 @@ public class BaseQueryBuilder implements IQueryBuilder
      * @param end
      *            The end
      */
-    public BaseQueryBuilder setEnd(Integer end)
+    public BaseQueryBuilder setEnd(Long end)
     {
         this.end = end;
         return this;
