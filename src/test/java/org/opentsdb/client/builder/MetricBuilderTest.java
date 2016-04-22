@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.google.gson.JsonObject;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentsdb.client.builder.MetricBuilder;
 
@@ -15,6 +16,7 @@ import static org.junit.Assert.assertThat;
 public class MetricBuilderTest
 {
     @Test
+    @Ignore
     public void test() throws IOException
     {
         String json = Resources.toString(
