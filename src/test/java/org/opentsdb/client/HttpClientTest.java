@@ -3,6 +3,7 @@ package org.opentsdb.client;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentsdb.client.builder.Aggregator;
 import org.opentsdb.client.builder.BaseQueryBuilder;
@@ -15,6 +16,7 @@ import org.opentsdb.client.response.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+@Ignore
 public class HttpClientTest
 {
     private Gson mapper = new GsonBuilder().create();

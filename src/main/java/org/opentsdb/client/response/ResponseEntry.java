@@ -4,6 +4,7 @@
 package org.opentsdb.client.response;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class ResponseEntry
 
     @SerializedName("tags")
     @Expose
-    private Map<String, String> tags;
+    private Map<String, String> tags = new HashMap<String, String>();
 
     @SerializedName("aggregatedTags")
     @Expose
@@ -45,7 +46,7 @@ public class ResponseEntry
 
     @SerializedName("dps")
     @Expose
-    private Map<String, Number> dataPoints;
+    private Map<String, Number> dataPoints = new HashMap<String, Number>();
 
     /**
      *

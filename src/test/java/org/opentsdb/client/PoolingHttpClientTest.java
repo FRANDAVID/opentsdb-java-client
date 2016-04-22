@@ -2,10 +2,12 @@ package org.opentsdb.client;
 
 import java.io.IOException;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opentsdb.client.builder.MetricBuilder;
 import org.opentsdb.client.response.SimpleHttpResponse;
 
+@Ignore
 public class PoolingHttpClientTest {
 
 	@Test

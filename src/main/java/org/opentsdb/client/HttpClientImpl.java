@@ -57,7 +57,6 @@ public class HttpClientImpl implements HttpClient
     {
         checkNotNull(builder);
 
-        System.out.println(builder.build());
         // TODO 错误处理，比如IOException或者failed>0，写到队列或者文件后续重试。
         SimpleHttpResponse response = httpClient
                 .doPost(buildUrl(serviceUrl, POST_API, expectResponse),
@@ -115,7 +114,6 @@ public class HttpClientImpl implements HttpClient
     public QueryResponse queryMetrics(IQueryBuilder queryBuilder) throws IOException
     {
         checkNotNull(queryBuilder);
-        System.out.println(queryBuilder.build());
         SimpleHttpResponse response = httpClient.doPost(buildUrl(serviceUrl, QUERY_API, ExpectResponse.RESULTS), queryBuilder.build());
         if (response.getStatusCode() == 200)
         {

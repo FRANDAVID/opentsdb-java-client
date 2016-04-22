@@ -136,4 +136,58 @@ public class Query
         this.tsuids = tsuids;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((aggregator == null) ? 0 : aggregator.hashCode());
+        result = prime * result + ((filters == null) ? 0 : filters.hashCode());
+        result = prime * result + ((metric == null) ? 0 : metric.hashCode());
+        result = prime * result + ((rate == null) ? 0 : rate.hashCode());
+        result = prime * result + ((tsuids == null) ? 0 : tsuids.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        Query other = (Query) obj;
+        if (aggregator == null)
+        {
+            if (other.aggregator != null) return false;
+        }
+        else if (!aggregator.equals(other.aggregator)) return false;
+        if (filters == null)
+        {
+            if (other.filters != null) return false;
+        }
+        else if (!filters.equals(other.filters)) return false;
+        if (metric == null)
+        {
+            if (other.metric != null) return false;
+        }
+        else if (!metric.equals(other.metric)) return false;
+        if (rate == null)
+        {
+            if (other.rate != null) return false;
+        }
+        else if (!rate.equals(other.rate)) return false;
+        if (tsuids == null)
+        {
+            if (other.tsuids != null) return false;
+        }
+        else if (!tsuids.equals(other.tsuids)) return false;
+        return true;
+    }
+
 }
