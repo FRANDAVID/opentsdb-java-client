@@ -3,12 +3,15 @@ package org.opentsdb.client;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.opentsdb.client.builder.IQueryBuilder;
 import org.opentsdb.client.builder.MetricBuilder;
+import org.opentsdb.client.response.DataPoint;
 import org.opentsdb.client.response.ErrorDetail;
 import org.opentsdb.client.response.QueryResponse;
 import org.opentsdb.client.response.Response;
@@ -19,6 +22,7 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
@@ -114,16 +118,41 @@ public class HttpClientImpl implements HttpClient
     public QueryResponse queryMetrics(IQueryBuilder queryBuilder) throws IOException
     {
         checkNotNull(queryBuilder);
+        System.out.println(queryBuilder.build());
         SimpleHttpResponse response = httpClient.doPost(buildUrl(serviceUrl, QUERY_API, ExpectResponse.RESULTS), queryBuilder.build());
         if (response.getStatusCode() == 200)
         {
             String json = response.getContent();
+            System.out.println(json);
             List<ResponseEntry> entries = mapper.fromJson(json, new TypeToken<List<ResponseEntry>>() {}.getType());
+            extractDataPoints(entries);
             QueryResponse qResponse = new QueryResponse();
             qResponse.setEntries(entries);
             return qResponse;
         }
         return null;
+    }
+
+    protected void extractDataPoints(List<ResponseEntry> entries)
+    {
+        for (ResponseEntry entry : entries)
+        {
+            entry.setDataPointsList(mapDatapoints(entry.getDataPoints()));
+        }
+    }
+
+    // to handle duplicates we must deserialize datapoints by hand
+    protected List<DataPoint> mapDatapoints(JsonObject json)
+    {
+        List<DataPoint> points = new ArrayList<DataPoint>();
+        for (Entry<String, JsonElement> e : json.entrySet())
+        {
+            DataPoint p = new DataPoint();
+            p.setTimestamp(e.getKey());
+            p.setValue(e.getValue().getAsNumber());
+            points.add(p);
+        }
+        return points;
     }
 
     /*

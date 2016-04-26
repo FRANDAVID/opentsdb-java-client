@@ -16,7 +16,7 @@ import org.opentsdb.client.response.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@Ignore
+//@Ignore
 public class HttpClientTest
 {
     private Gson mapper = new GsonBuilder().create();
@@ -59,6 +59,7 @@ public class HttpClientTest
         IQueryBuilder queryBuilder = BaseQueryBuilder.getInstance().setStart(1l).addQuery(query);
         QueryResponse response = client.queryMetrics(queryBuilder);
         System.out.println(mapper.toJson(response.getEntries().get(0)));
+        System.out.println(response.getEntries().get(0).getDataPointsList());
     }
 
     @Test

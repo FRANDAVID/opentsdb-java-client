@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.Generated;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -44,9 +45,17 @@ public class ResponseEntry
     @Expose
     private List<String> tsuids = new ArrayList<String>();
 
+//    @SerializedName("dps")
+//    @Expose
+//    private Map<String, Number> dataPoints = new HashMap<String, Number>();
+    
+//    @SerializedName("dps")
+//    @Expose
+    private List<DataPoint> dataPointsList = new ArrayList<DataPoint>();
+    
     @SerializedName("dps")
     @Expose
-    private Map<String, Number> dataPoints = new HashMap<String, Number>();
+    private JsonObject dataPoints = new JsonObject();
 
     /**
      *
@@ -169,23 +178,57 @@ public class ResponseEntry
     }
 
     /**
-     *
-     * @return
-     *         The dps
+     * @return the dataPoints
      */
-    public Map<String, Number> getDataPoints()
+    public List<DataPoint> getDataPointsList()
+    {
+        return dataPointsList;
+    }
+
+    /**
+     * @param dataPoints the dataPoints to set
+     */
+    public void setDataPointsList(List<DataPoint> dataPoints)
+    {
+        this.dataPointsList = dataPoints;
+    }
+
+    /**
+     * @return the dataPoints
+     */
+    public JsonObject getDataPoints()
     {
         return dataPoints;
     }
 
     /**
-     *
-     * @param dps
-     *            The dps
+     * @param dataPoints the dataPoints to set
      */
-    public void setDataPoints(Map<String, Number> dps)
+    public void setDataPoints(JsonObject dataPoints)
     {
-        this.dataPoints = dps;
+        this.dataPoints = dataPoints;
     }
+
+    
+    
+//    /**
+//     *
+//     * @return
+//     *         The dps
+//     */
+//    public Map<String, Number> getDataPoints()
+//    {
+//        return dataPoints;
+//    }
+//
+//    /**
+//     *
+//     * @param dps
+//     *            The dps
+//     */
+//    public void setDataPoints(Map<String, Number> dps)
+//    {
+//        this.dataPoints = dps;
+//    }
 
 }

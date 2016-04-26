@@ -34,5 +34,7 @@ public class QueryResponseTest
         System.out.println(mapper.toJson(response.getEntries().get(0)));
         assertEquals(1, response.getEntries().size());
         assertEquals("tsd.hbase.puts", response.getEntries().get(0).getMetric());
+        System.out.println(response.getEntries().get(0).getDataPoints());
+        System.out.println(response.getEntries().get(0).getDataPointsList());
     }
 }
