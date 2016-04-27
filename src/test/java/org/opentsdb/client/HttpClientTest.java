@@ -16,7 +16,7 @@ import org.opentsdb.client.response.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-//@Ignore
+@Ignore
 public class HttpClientTest
 {
     private Gson mapper = new GsonBuilder().create();
