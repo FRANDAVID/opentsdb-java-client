@@ -25,22 +25,22 @@ public class BaseQueryBuilder implements IQueryBuilder
 
     @SerializedName("start")
     @Expose
-    private Long start;
+    protected Long start;
 
     @SerializedName("end")
     @Expose
-    private Long end;
+    protected Long end;
 
     @SerializedName("queries")
     @Expose
-    private List<Query> queries = new ArrayList<Query>();
+    protected List<Query> queries = new ArrayList<Query>();
 
-    private transient Gson mapper;
+    protected transient Gson mapper;
 
     /**
      * 
      */
-    private BaseQueryBuilder()
+    protected BaseQueryBuilder()
     {
         GsonBuilder builder = new GsonBuilder();
         mapper = builder.create();

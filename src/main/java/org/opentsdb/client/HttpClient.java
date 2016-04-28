@@ -15,6 +15,8 @@ public interface HttpClient extends Client
             ExpectResponse exceptResponse) throws IOException;
 
     public QueryResponse queryMetrics(IQueryBuilder queryBuilder) throws IOException;
+    
+    public boolean deleteMetrics(IQueryBuilder queryBuilder) throws IOException;
 
     public List<String> suggest(SuggestType type, String query, Integer max) throws IOException;
 }

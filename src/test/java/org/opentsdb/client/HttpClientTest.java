@@ -54,7 +54,7 @@ public class HttpClientTest
     public void testQueryMetrics() throws IOException
     {
         Query query = new Query();
-        query.setAggregator(Aggregator.SUM.getName());
+        query.setAggregator(Aggregator.SUM);
         query.setMetric("metric3.test1");
         IQueryBuilder queryBuilder = BaseQueryBuilder.getInstance().setStart(1l).addQuery(query);
         QueryResponse response = client.queryMetrics(queryBuilder);

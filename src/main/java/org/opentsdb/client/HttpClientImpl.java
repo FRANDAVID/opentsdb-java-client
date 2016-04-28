@@ -18,8 +18,6 @@ import org.opentsdb.client.response.Response;
 import org.opentsdb.client.response.ResponseEntry;
 import org.opentsdb.client.response.SimpleHttpResponse;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Resources;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -182,5 +180,21 @@ public class HttpClientImpl implements HttpClient
             return entries;
         }
         return null;
+    }
+
+    /* (non-Javadoc)
+     * @see org.opentsdb.client.HttpClient#deleteMetrics(org.opentsdb.client.builder.IQueryBuilder)
+     */
+    @Override
+    public boolean deleteMetrics(IQueryBuilder queryBuilder) throws IOException
+    {
+        checkNotNull(queryBuilder);
+        System.out.println(queryBuilder.build());
+        SimpleHttpResponse response = httpClient.doPost(buildUrl(serviceUrl, QUERY_API, ExpectResponse.RESULTS), queryBuilder.build());
+        if (response.getStatusCode() == 200)
+        {
+            return true;
+        }
+        return false;
     }
 }
