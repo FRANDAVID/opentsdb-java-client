@@ -101,6 +101,9 @@ public class HttpClientImpl implements HttpClient
             }
             else
             {
+                ErrorDetail errorDetail = mapper.fromJson(content,
+                        ErrorDetail.class);
+                response.setErrorDetail(errorDetail);
                 logger.error("request failed!" + httpResponse);
             }
         }

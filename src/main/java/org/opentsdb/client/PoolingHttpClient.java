@@ -30,246 +30,298 @@ import org.opentsdb.client.response.SimpleHttpResponse;
  * @author arganzheng
  *
  */
-public class PoolingHttpClient {
+public class PoolingHttpClient
+{
 
-	private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 200;
+    private static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 200;
 
-	private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = DEFAULT_MAX_TOTAL_CONNECTIONS;
+    private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = DEFAULT_MAX_TOTAL_CONNECTIONS;
 
-	private static final int DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = (10 * 1000);
-	private static final int DEFAULT_READ_TIMEOUT_MILLISECONDS = (10 * 1000);
-	private static final int DEFAULT_WAIT_TIMEOUT_MILLISECONDS = (10 * 1000);
+    private static final int DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS = (10 * 1000);
 
-	private static final int DEFAULT_KEEP_ALIVE_MILLISECONDS = (5 * 60 * 1000);
+    private static final int DEFAULT_READ_TIMEOUT_MILLISECONDS = (10 * 1000);
 
-	private static final String DEFAULT_CHARSET = "UTF-8";
+    private static final int DEFAULT_WAIT_TIMEOUT_MILLISECONDS = (10 * 1000);
 
-	private static final int DEFAULT_RETRY_COUNT = 2;
+    private static final int DEFAULT_KEEP_ALIVE_MILLISECONDS = (5 * 60 * 1000);
 
-	private int keepAlive = DEFAULT_KEEP_ALIVE_MILLISECONDS;
+    private static final String DEFAULT_CHARSET = "UTF-8";
 
-	private int maxTotalConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
-	private int maxConnectionsPerRoute = DEFAULT_MAX_CONNECTIONS_PER_ROUTE;
+    private static final int DEFAULT_RETRY_COUNT = 2;
 
-	private int connectTimeout = DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS;
-	private int readTimeout = DEFAULT_READ_TIMEOUT_MILLISECONDS;
-	private int waitTimeout = DEFAULT_WAIT_TIMEOUT_MILLISECONDS;
+    private int keepAlive = DEFAULT_KEEP_ALIVE_MILLISECONDS;
 
-	private int retries = DEFAULT_RETRY_COUNT;
+    private int maxTotalConnections = DEFAULT_MAX_TOTAL_CONNECTIONS;
 
-	private PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
+    private int maxConnectionsPerRoute = DEFAULT_MAX_CONNECTIONS_PER_ROUTE;
 
-	private CloseableHttpClient httpClient = null;
+    private int connectTimeout = DEFAULT_CONNECTION_TIMEOUT_MILLISECONDS;
 
-	private ConnectionKeepAliveStrategy keepAliveStrategy = new ConnectionKeepAliveStrategy() {
-		@Override
-		public long getKeepAliveDuration(HttpResponse response,
-				HttpContext context) {
-			HeaderElementIterator it = new BasicHeaderElementIterator(
-					response.headerIterator(HTTP.CONN_KEEP_ALIVE));
-			while (it.hasNext()) {
-				HeaderElement he = it.nextElement();
-				String param = he.getName();
-				String value = he.getValue();
-				if (value != null && param.equalsIgnoreCase("timeout")) {
-					return Long.parseLong(value) * 1000;
-				}
-			}
-			return keepAlive;
-		}
-	};
+    private int readTimeout = DEFAULT_READ_TIMEOUT_MILLISECONDS;
 
-	public PoolingHttpClient() {
-		// Increase max total connection
-		connManager.setMaxTotal(maxTotalConnections);
-		// Increase default max connection per route
-		connManager.setDefaultMaxPerRoute(maxConnectionsPerRoute);
+    private int waitTimeout = DEFAULT_WAIT_TIMEOUT_MILLISECONDS;
 
-		// config timeout
-		RequestConfig config = RequestConfig.custom()
-				.setConnectTimeout(connectTimeout)
-				.setConnectionRequestTimeout(waitTimeout)
-				.setSocketTimeout(readTimeout).build();
+    private int retries = DEFAULT_RETRY_COUNT;
 
-		httpClient = HttpClients.custom()
-				.setKeepAliveStrategy(keepAliveStrategy)
-				.setConnectionManager(connManager)
-				.setDefaultRequestConfig(config).build();
+    private PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager();
 
-		// detect idle and expired connections and close them
-		IdleConnectionMonitorThread staleMonitor = new IdleConnectionMonitorThread(
-				connManager);
-		staleMonitor.start();
-	}
+    private CloseableHttpClient httpClient = null;
 
-	public SimpleHttpResponse doPost(String url, String data)
-			throws IOException {
-		StringEntity requestEntity = new StringEntity(data);
-		HttpPost postMethod = new HttpPost(url);
-		postMethod.setEntity(requestEntity);
+    private ConnectionKeepAliveStrategy keepAliveStrategy = new ConnectionKeepAliveStrategy() {
+        @Override
+        public long getKeepAliveDuration(HttpResponse response,
+                HttpContext context)
+        {
+            HeaderElementIterator it = new BasicHeaderElementIterator(
+                    response.headerIterator(HTTP.CONN_KEEP_ALIVE));
+            while (it.hasNext())
+            {
+                HeaderElement he = it.nextElement();
+                String param = he.getName();
+                String value = he.getValue();
+                if (value != null && param.equalsIgnoreCase("timeout"))
+                {
+                    return Long.parseLong(value) * 1000;
+                }
+            }
+            return keepAlive;
+        }
+    };
 
-		HttpResponse response = execute(postMethod);
-		int statusCode = response.getStatusLine().getStatusCode();
+    public PoolingHttpClient()
+    {
+        // Increase max total connection
+        connManager.setMaxTotal(maxTotalConnections);
+        // Increase default max connection per route
+        connManager.setDefaultMaxPerRoute(maxConnectionsPerRoute);
 
-		SimpleHttpResponse simpleResponse = new SimpleHttpResponse();
-		simpleResponse.setStatusCode(statusCode);
+        // config timeout
+        RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(connectTimeout)
+                .setConnectionRequestTimeout(waitTimeout)
+                .setSocketTimeout(readTimeout).build();
 
-		HttpEntity entity = response.getEntity();
-		if (entity != null) {
-			// should return: application/json; charset=UTF-8
-			String ctype = entity.getContentType().getValue();
-			String charset = getResponseCharset(ctype);
-			String content = EntityUtils.toString(entity, charset);
-			simpleResponse.setContent(content);
-		}
+        httpClient = HttpClients.custom()
+                .setKeepAliveStrategy(keepAliveStrategy)
+                .setConnectionManager(connManager)
+                .setDefaultRequestConfig(config).build();
 
-		return simpleResponse;
-	}
+        // detect idle and expired connections and close them
+        IdleConnectionMonitorThread staleMonitor = new IdleConnectionMonitorThread(
+                connManager);
+        staleMonitor.start();
+    }
 
-	private static String getResponseCharset(String ctype) {
-		String charset = DEFAULT_CHARSET;
+    public SimpleHttpResponse doPost(String url, String data)
+            throws IOException
+    {
+        StringEntity requestEntity = new StringEntity(data);
+        HttpPost postMethod = new HttpPost(url);
+        postMethod.setEntity(requestEntity);
 
-		if (!StringUtils.isEmpty(ctype)) {
-			String[] params = ctype.split(";");
-			for (String param : params) {
-				param = param.trim();
-				if (param.startsWith("charset")) {
-					String[] pair = param.split("=", 2);
-					if (pair.length == 2) {
-						if (!StringUtils.isEmpty(pair[1])) {
-							charset = pair[1].trim();
-						}
-					}
-					break;
-				}
-			}
-		}
+        HttpResponse response = execute(postMethod);
+        int statusCode = response.getStatusLine().getStatusCode();
 
-		return charset;
-	}
+        SimpleHttpResponse simpleResponse = new SimpleHttpResponse();
+        simpleResponse.setStatusCode(statusCode);
+        simpleResponse.setStatusContent(response.getStatusLine().getReasonPhrase());
 
-	public HttpResponse execute(HttpUriRequest request) throws IOException {
-		HttpResponse response;
+        HttpEntity entity = response.getEntity();
+        if (entity != null)
+        {
+            // should return: application/json; charset=UTF-8
+            String ctype = entity.getContentType().getValue();
+            String charset = getResponseCharset(ctype);
+            String content = EntityUtils.toString(entity, charset);
+            simpleResponse.setContent(content);
+        }
 
-		int tries = ++retries;
-		while (true) {
-			tries--;
-			try {
-				response = httpClient.execute(request);
-				break;
-			} catch (IOException e) {
-				if (tries < 1)
-					throw e;
-			}
-		}
+        return simpleResponse;
+    }
 
-		return response;
-	}
+    private static String getResponseCharset(String ctype)
+    {
+        String charset = DEFAULT_CHARSET;
 
-	public void shutdown() throws IOException {
-		httpClient.close();
-	}
+        if (!StringUtils.isEmpty(ctype))
+        {
+            String[] params = ctype.split(";");
+            for (String param : params)
+            {
+                param = param.trim();
+                if (param.startsWith("charset"))
+                {
+                    String[] pair = param.split("=", 2);
+                    if (pair.length == 2)
+                    {
+                        if (!StringUtils.isEmpty(pair[1]))
+                        {
+                            charset = pair[1].trim();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
 
-	public int getKeepAlive() {
-		return keepAlive;
-	}
+        return charset;
+    }
 
-	public void setKeepAlive(int keepAlive) {
-		this.keepAlive = keepAlive;
-	}
+    public HttpResponse execute(HttpUriRequest request) throws IOException
+    {
+        HttpResponse response;
 
-	public int getMaxTotalConnections() {
-		return maxTotalConnections;
-	}
+        int tries = ++retries;
+        while (true)
+        {
+            tries--;
+            try
+            {
+                response = httpClient.execute(request);
+                break;
+            }
+            catch (IOException e)
+            {
+                if (tries < 1)
+                    throw e;
+            }
+        }
 
-	public void setMaxTotalConnections(int maxTotalConnections) {
-		this.maxTotalConnections = maxTotalConnections;
-	}
+        return response;
+    }
 
-	public int getMaxConnectionsPerRoute() {
-		return maxConnectionsPerRoute;
-	}
+    public void shutdown() throws IOException
+    {
+        httpClient.close();
+    }
 
-	public void setMaxConnectionsPerRoute(int maxConnectionsPerRoute) {
-		this.maxConnectionsPerRoute = maxConnectionsPerRoute;
-	}
+    public int getKeepAlive()
+    {
+        return keepAlive;
+    }
 
-	public int getConnectTimeout() {
-		return connectTimeout;
-	}
+    public void setKeepAlive(int keepAlive)
+    {
+        this.keepAlive = keepAlive;
+    }
 
-	public void setConnectTimeout(int connectTimeout) {
-		this.connectTimeout = connectTimeout;
-	}
+    public int getMaxTotalConnections()
+    {
+        return maxTotalConnections;
+    }
 
-	public int getReadTimeout() {
-		return readTimeout;
-	}
+    public void setMaxTotalConnections(int maxTotalConnections)
+    {
+        this.maxTotalConnections = maxTotalConnections;
+    }
 
-	public void setReadTimeout(int readTimeout) {
-		this.readTimeout = readTimeout;
-	}
+    public int getMaxConnectionsPerRoute()
+    {
+        return maxConnectionsPerRoute;
+    }
 
-	public int getWaitTimeout() {
-		return waitTimeout;
-	}
+    public void setMaxConnectionsPerRoute(int maxConnectionsPerRoute)
+    {
+        this.maxConnectionsPerRoute = maxConnectionsPerRoute;
+    }
 
-	public void setWaitTimeout(int waitTimeout) {
-		this.waitTimeout = waitTimeout;
-	}
+    public int getConnectTimeout()
+    {
+        return connectTimeout;
+    }
 
-	public PoolingHttpClientConnectionManager getConnManager() {
-		return connManager;
-	}
+    public void setConnectTimeout(int connectTimeout)
+    {
+        this.connectTimeout = connectTimeout;
+    }
 
-	public void setConnManager(PoolingHttpClientConnectionManager connManager) {
-		this.connManager = connManager;
-	}
+    public int getReadTimeout()
+    {
+        return readTimeout;
+    }
 
-	public int getRetryCount() {
-		return retries;
-	}
+    public void setReadTimeout(int readTimeout)
+    {
+        this.readTimeout = readTimeout;
+    }
 
-	public void setRetryCount(int retries) {
-		checkArgument(retries >= 0);
-		this.retries = retries;
-	}
+    public int getWaitTimeout()
+    {
+        return waitTimeout;
+    }
 
-	public static class IdleConnectionMonitorThread extends Thread {
+    public void setWaitTimeout(int waitTimeout)
+    {
+        this.waitTimeout = waitTimeout;
+    }
 
-		private final HttpClientConnectionManager connMgr;
-		private volatile boolean shutdown;
+    public PoolingHttpClientConnectionManager getConnManager()
+    {
+        return connManager;
+    }
 
-		public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
-			super();
-			this.connMgr = connMgr;
-		}
+    public void setConnManager(PoolingHttpClientConnectionManager connManager)
+    {
+        this.connManager = connManager;
+    }
 
-		@Override
-		public void run() {
-			try {
-				while (!shutdown) {
-					synchronized (this) {
-						wait(5000);
-						// Close expired connections
-						connMgr.closeExpiredConnections();
-						// Optionally, close connections
-						// that have been idle longer than 60 sec
-						connMgr.closeIdleConnections(60, TimeUnit.SECONDS);
-					}
-				}
-			} catch (InterruptedException ex) {
-				// terminate
-				shutdown();
-			}
-		}
+    public int getRetryCount()
+    {
+        return retries;
+    }
 
-		public void shutdown() {
-			shutdown = true;
-			synchronized (this) {
-				notifyAll();
-			}
-		}
+    public void setRetryCount(int retries)
+    {
+        checkArgument(retries >= 0);
+        this.retries = retries;
+    }
 
-	}
+    public static class IdleConnectionMonitorThread extends Thread
+    {
+
+        private final HttpClientConnectionManager connMgr;
+
+        private volatile boolean shutdown;
+
+        public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr)
+        {
+            super();
+            this.connMgr = connMgr;
+        }
+
+        @Override
+        public void run()
+        {
+            try
+            {
+                while (!shutdown)
+                {
+                    synchronized (this)
+                    {
+                        wait(5000);
+                        // Close expired connections
+                        connMgr.closeExpiredConnections();
+                        // Optionally, close connections
+                        // that have been idle longer than 60 sec
+                        connMgr.closeIdleConnections(60, TimeUnit.SECONDS);
+                    }
+                }
+            }
+            catch (InterruptedException ex)
+            {
+                // terminate
+                shutdown();
+            }
+        }
+
+        public void shutdown()
+        {
+            shutdown = true;
+            synchronized (this)
+            {
+                notifyAll();
+            }
+        }
+
+    }
 }
