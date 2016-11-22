@@ -10,6 +10,12 @@
 	<name>opentsdbclient</name>
 	<description>Java client for pushing and querying data to/from OpenTSDB</description>
 	<url>http://opentsdb.org</url>
+	
+    <scm>
+		<connection>scm:git:ssh://git@git.evermind.de:2007/gisaconnect/opentsdb-java-client.git</connection>
+		<tag>HEAD</tag>
+	</scm>
+
 
 	<dependencies>
 		<dependency>
