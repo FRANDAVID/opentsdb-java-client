@@ -10,6 +10,10 @@ package org.opentsdb.client;
  * @author argan
  *
  */
-public enum ExpectResponse {
-	STATUS_CODE, SUMMARY, DETAIL
+public enum ExpectResponse
+{
+    STATUS_CODE,
+    SUMMARY,
+    DETAIL,
+    RESULTS
 }

@@ -15,6 +15,8 @@ public interface Client {
 	public final static Integer GIT1=0;
 	public final static Integer GIT2=0;
 	public final static String POST_API = "/api/put";
+	public final static String QUERY_API = "/api/query";
+	public final static String SUGGEST_API = "/api/suggest";
 
 	/**
 	 * Sends metrics from the builder to the KairosDB server.
